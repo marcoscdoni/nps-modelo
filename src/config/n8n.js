@@ -176,9 +176,28 @@ export const submitToN8n = async (surveyData, token = null) => {
       result = null
     }
 
-  console.log('backend response:', result)
+    console.log('backend response:', result)
 
-    return { success: true, data: result }
+    // Some webhooks return an envelope array like [{ success: true, message: '...' }]
+    // or an object { success: true, message: '...' }. Inspect the payload and
+    // reflect the webhook-reported success status when present.
+    let webhookSuccess = true
+    let webhookMessage = null
+    if (result == null) {
+      webhookSuccess = true
+    } else if (Array.isArray(result) && result.length > 0 && typeof result[0].success === 'boolean') {
+      webhookSuccess = Boolean(result[0].success)
+      webhookMessage = result[0].message || null
+    } else if (result && typeof result.success === 'boolean') {
+      webhookSuccess = Boolean(result.success)
+      webhookMessage = result.message || null
+    }
+
+    if (!webhookSuccess) {
+      return { success: false, error: webhookMessage || 'Webhook responded with failure', data: result }
+    }
+
+    return { success: true, data: result, message: webhookMessage }
   } catch (error) {
     console.error('Error submitting to n8n:', error)
     return { success: false, error: error.message }
