@@ -8,3 +8,6 @@ dist/
 coverage/
 /.idea/
 /.vscode/
+
+# Test scripts
+test-*.sh
