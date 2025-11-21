@@ -1,5 +1,21 @@
 <template>
 	<div class="min-h-screen bg-gradient-to-br relative">
+		<!-- Loading Overlay Modal (aparece por cima de tudo) -->
+		<div v-if="isSubmitting" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
+			<div class="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl animate-scale-in">
+				<div class="animate-spin w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-6"></div>
+				<h2 class="text-2xl font-bold text-gray-800 mb-4">Processando...</h2>
+				<p class="text-gray-600">Aguarde enquanto salvamos sua pesquisa no sistema.</p>
+				<div class="mt-6 flex justify-center">
+					<div class="flex space-x-1">
+						<div class="w-2 h-2 bg-green-500 rounded-full animate-bounce"></div>
+						<div class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+						<div class="w-2 h-2 bg-green-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 	<div class="container mx-auto px-4 py-8 max-w-2xl pb-20">
 			<!-- Header -->
 	    <div class="text-center mb-8 animate-fade-in">
@@ -11,11 +27,7 @@
 											</div>
 										</div>
 					<!-- token info / validation messages -->
-					<p v-if="tokenState.status === 'loading'" class="text-sm text-white mt-2 flex items-center justify-center gap-1"> 
-						<Spinner size="sm" color="white" />
-						<span>Carregando sua pesquisa</span>
-					</p>
-					<p v-else-if="tokenState.status === 'ready' && tokenState.data && tokenState.data.tokenStatus === 'valid'" class="text-sm text-white mt-2">Respondendo pesquisa como: <strong>{{ tokenState.data.name }}</strong></p>
+					<p v-if="tokenState.status === 'ready' && tokenState.data && tokenState.data.tokenStatus === 'valid'" class="text-sm text-white mt-2">Respondendo pesquisa como: <strong>{{ tokenState.data.name }}</strong></p>
 				</div>
 
 			<!-- Progress Bar -->
@@ -154,9 +166,10 @@
 				<p class="text-gray-600 text-lg mb-8 leading-relaxed">Sua pesquisa foi enviada com sucesso. Suas respostas são muito importantes para nós!</p>
 			</div>
 
-			<div v-if="isSubmitting" class="card text-center mb-5"><div class="animate-spin w-16 h-16 border-4 border-green-500 border-t-transparent rounded-full mx-auto mb-6"></div><h2 class="text-2xl font-bold text-gray-800 mb-4">Enviando...</h2><p class="text-gray-600">Aguarde enquanto enviamos sua pesquisa.</p></div>
+			<!-- submission modal handled as popup (see script) -->
 
-			<div v-if="submitError" class="card text-center mb-5"><div class="text-6xl mb-6">❌</div><h2 class="text-3xl font-bold text-red-600 mb-4">Erro ao Enviar</h2><p class="text-gray-600 text-lg mb-8">{{ submitError }}</p><button @click="retrySubmit" class="btn-primary mr-4">Tentar Novamente</button><button @click="resetSurvey" class="btn-secondary">Recomeçar</button></div>
+
+						<div v-if="submitError" class="card text-center mb-5"><div class="text-6xl mb-6">❌</div><h2 class="text-3xl font-bold text-red-600 mb-4">Erro ao Enviar</h2><p class="text-gray-600 text-lg mb-8">{{ submitError }}</p><button @click="retrySubmit" class="btn-primary mr-4">Tentar Novamente</button><button @click="resetSurvey" class="btn-secondary">Recomeçar</button></div>
 
 
 
@@ -478,33 +491,41 @@ export default {
 		const previousStep = () => { if (currentStep.value > 1) { currentStep.value--; stepError.value = ''; scrollToCard() } }
 
 		const submitSurvey = async () => {
-			isSubmitting.value = true; submitError.value = ''
+			// Show loading overlay and disable interactions
+			isSubmitting.value = true
+			submitError.value = ''
 			try {
-								const surveyData = {
-									nps_score: formData.npsScore,
-									overall_satisfaction: formData.overallSatisfaction,
-									reception_service: formData.receptionService,
-									theory_classes: formData.theoryClasses,
-									practical_car_classes: formData.practicalCarClasses,
-									practical_moto_classes: formData.practicalMotoClasses,
-									practical_instructor_car: formData.practicalInstructorCar,
-									practical_instructor_moto: formData.practicalInstructorMoto,
-									vehicle_conditions: formData.vehicleConditions,
-									infrastructure: formData.infrastructure,
-									dislikes: formData.dislikes,
-									likes: formData.likes,
-									comments: formData.comments
-								}
+				const surveyData = {
+					nps_score: formData.npsScore,
+					overall_satisfaction: formData.overallSatisfaction,
+					reception_service: formData.receptionService,
+					theory_classes: formData.theoryClasses,
+					practical_car_classes: formData.practicalCarClasses,
+					practical_moto_classes: formData.practicalMotoClasses,
+					practical_instructor_car: formData.practicalInstructorCar,
+					practical_instructor_moto: formData.practicalInstructorMoto,
+					vehicle_conditions: formData.vehicleConditions,
+					infrastructure: formData.infrastructure,
+					dislikes: formData.dislikes,
+					likes: formData.likes,
+					comments: formData.comments
+				}
 				// Pass the token as second parameter to submitToN8n
 				const result = await submitToN8n(surveyData, tokenState.token)
+				// result may carry webhook-level success flag in its payload (handled by submitToN8n)
 				if (result.success) {
 					currentStep.value++
-					// Clear saved progress after successful submission
 					clearProgress()
+				} else {
+					const errorMessage = result.error || (result.data && result.data[0] && result.data[0].message) || 'Erro desconhecido ao enviar a pesquisa.'
+					submitError.value = errorMessage
 				}
-				else submitError.value = result.error || 'Erro desconhecido ao enviar a pesquisa.'
-			} catch (error) { console.error('Submit error:', error); submitError.value = 'Erro de conexão. Verifique sua internet e tente novamente.' }
-			finally { isSubmitting.value = false }
+			} catch (error) {
+				console.error('Submit error:', error)
+				submitError.value = 'Erro de conexão. Verifique sua internet e tente novamente.'
+			} finally {
+				isSubmitting.value = false
+			}
 		}
 
 				const retrySubmit = () => { submitError.value = ''; currentStep.value = questions.value.length }
@@ -536,5 +557,50 @@ textarea.text-gray-800 {
 button:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
+}
+
+/* Loading Modal Animations */
+@keyframes scale-in {
+	0% { 
+		transform: scale(0.9); 
+		opacity: 0; 
+	}
+	100% { 
+		transform: scale(1); 
+		opacity: 1; 
+	}
+}
+
+.animate-scale-in {
+	animation: scale-in 0.3s ease-out;
+}
+
+/* Bounce animation for dots */
+@keyframes bounce {
+	0%, 80%, 100% {
+		transform: translateY(0);
+	}
+	40% {
+		transform: translateY(-8px);
+	}
+}
+
+.animate-bounce {
+	animation: bounce 1.4s infinite;
+}
+
+/* Backdrop blur support for older browsers */
+.backdrop-blur-sm {
+	backdrop-filter: blur(4px);
+	-webkit-backdrop-filter: blur(4px);
+}
+
+/* Fixed positioning enhancements for mobile */
+.fixed.inset-0 {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
 }
 </style>
