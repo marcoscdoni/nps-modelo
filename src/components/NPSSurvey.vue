@@ -1,5 +1,5 @@
 <template>
-	<div class="min-h-screen bg-gradient-to-br relative">
+	<div class="min-h-screen bg-gradient-to-br relative overflow-x-hidden">
 		<!-- Loading Overlay Modal (aparece por cima de tudo) -->
 		<div v-if="isSubmitting" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
 			<div class="bg-white rounded-2xl p-8 mx-4 max-w-sm w-full text-center shadow-2xl animate-scale-in">
@@ -105,8 +105,9 @@
 				</div>
 
 			<!-- Question Steps -->
-					<transition v-if="hasValidToken" name="question-transition" mode="out-in">
-						<div v-if="currentStep > 0 && questions && currentStep <= questions.length" key="question" class="card animate-slide-in-right mb-5" ref="cardRef">
+			<div v-if="hasValidToken" class="transition-container">
+				<transition :name="slideDirection === 'forward' ? 'slide-left' : 'slide-right'">
+					<div v-if="currentStep > 0 && questions && currentStep <= questions.length" :key="currentStep" class="card mb-5" ref="cardRef">
 					<div class="mb-6">
 						<div class="flex items-center justify-between mb-4">
 							<span class="text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">Pergunta {{ currentStep }}</span>
@@ -147,17 +148,23 @@
 									<p style="color: #ffecec; font-size: 0.9rem; margin: 0">{{ stepError }}</p>
 								</div>
 
-					<div class="flex justify-between items-center">
-						<button v-if="currentStep > 1" @click="previousStep" :disabled="isSubmitting" class="btn-secondary flex items-center gap-2">
-							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Voltar
+				<div class="flex justify-between items-center">
+					<button v-if="currentStep > 1" @click="previousStep" :disabled="isSubmitting" class="btn-secondary flex items-center gap-2">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg> Voltar
+					</button>
+					<div v-else></div>
+					<div class="flex gap-2 items-center">
+						<button v-if="currentStep === questions.length && isDev" @click="testSubmit" :disabled="isSubmitting" class="btn-secondary text-sm">
+							🧪 Teste
 						</button>
-						<div v-else></div>
 						<button @click="nextStep" :disabled="isSubmitting" class="btn-primary flex items-center gap-2">{{ currentStep === questions.length ? 'Finalizar' : 'Próxima' }}
 							<svg v-if="currentStep < questions.length" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
 						</button>
 					</div>
 				</div>
+				</div>
 			</transition>
+		</div>
 
 			<!-- Thank you / loading / error screens -->
 			<div v-if="currentStep > questions.length && !isSubmitting" class="card text-center animate-slide-in-right mb-5">
@@ -195,6 +202,7 @@ export default {
 		components: { LikertScale, MultipleChoice, NAButton, Spinner, Alert },
 	setup() {
 		const currentStep = ref(0)
+		const slideDirection = ref('forward')
 		// token state for validation flow
 		const tokenState = reactive({ status: 'idle', token: null, data: null, error: '' })
 		const isSubmitting = ref(false)
@@ -481,6 +489,7 @@ export default {
 					if (currentStep.value === questions.value.length) {
 						await submitSurvey()
 					} else {
+						slideDirection.value = 'forward'
 						currentStep.value++
 						// ensure the newly-rendered question is visible
 						scrollToCard()
@@ -488,48 +497,66 @@ export default {
 				}
 			}
 
-		const previousStep = () => { if (currentStep.value > 1) { currentStep.value--; stepError.value = ''; scrollToCard() } }
-
-		const submitSurvey = async () => {
-			// Show loading overlay and disable interactions
-			isSubmitting.value = true
-			submitError.value = ''
-			try {
-				const surveyData = {
-					nps_score: formData.npsScore,
-					overall_satisfaction: formData.overallSatisfaction,
-					reception_service: formData.receptionService,
-					theory_classes: formData.theoryClasses,
-					practical_car_classes: formData.practicalCarClasses,
-					practical_moto_classes: formData.practicalMotoClasses,
-					practical_instructor_car: formData.practicalInstructorCar,
-					practical_instructor_moto: formData.practicalInstructorMoto,
-					vehicle_conditions: formData.vehicleConditions,
-					infrastructure: formData.infrastructure,
-					dislikes: formData.dislikes,
-					likes: formData.likes,
-					comments: formData.comments
-				}
-				// Pass the token as second parameter to submitToN8n
-				const result = await submitToN8n(surveyData, tokenState.token)
-				// result may carry webhook-level success flag in its payload (handled by submitToN8n)
-				if (result.success) {
-					currentStep.value++
-					clearProgress()
-				} else {
-					const errorMessage = result.error || (result.data && result.data[0] && result.data[0].message) || 'Erro desconhecido ao enviar a pesquisa.'
-					submitError.value = errorMessage
-				}
-			} catch (error) {
-				console.error('Submit error:', error)
-				submitError.value = 'Erro de conexão. Verifique sua internet e tente novamente.'
-			} finally {
-				isSubmitting.value = false
+		const previousStep = () => {
+			if (currentStep.value > 1) {
+				slideDirection.value = 'backward'
+				currentStep.value--
+				stepError.value = ''
+				scrollToCard()
 			}
 		}
 
-				const retrySubmit = () => { submitError.value = ''; currentStep.value = questions.value.length }
-				const resetSurvey = () => {
+	const submitSurvey = async () => {
+		// Show loading overlay and disable interactions
+		isSubmitting.value = true
+		submitError.value = ''
+		
+		try {
+			const surveyData = {
+				nps_score: formData.npsScore,
+				overall_satisfaction: formData.overallSatisfaction,
+				reception_service: formData.receptionService,
+				theory_classes: formData.theoryClasses,
+				practical_car_classes: formData.practicalCarClasses,
+				practical_moto_classes: formData.practicalMotoClasses,
+				practical_instructor_car: formData.practicalInstructorCar,
+				practical_instructor_moto: formData.practicalInstructorMoto,
+				vehicle_conditions: formData.vehicleConditions,
+				infrastructure: formData.infrastructure,
+				dislikes: formData.dislikes,
+				likes: formData.likes,
+				comments: formData.comments
+			}
+			// Pass the token as second parameter to submitToN8n
+			const result = await submitToN8n(surveyData, tokenState.token)
+			// result may carry webhook-level success flag in its payload (handled by submitToN8n)
+			if (result.success) {
+				currentStep.value++
+				clearProgress()
+			} else {
+				const errorMessage = result.error || (result.data && result.data[0] && result.data[0].message) || 'Erro desconhecido ao enviar a pesquisa.'
+				submitError.value = errorMessage
+			}
+		} catch (error) {
+			console.error('Submit error:', error)
+			submitError.value = 'Erro de conexão. Verifique sua internet e tente novamente.'
+		} finally {
+			isSubmitting.value = false
+		}
+	}
+
+const testSubmit = async () => {
+	isSubmitting.value = true
+	await new Promise(resolve => setTimeout(resolve, 3000))
+	currentStep.value++
+	clearProgress()
+	isSubmitting.value = false
+}
+
+const isDev = import.meta.env.DEV
+
+const retrySubmit = () => { submitError.value = ''; currentStep.value = questions.value.length }
+const resetSurvey = () => {
 					currentStep.value = 0; isSubmitting.value = false; submitError.value = ''; stepError.value = '';
 					Object.keys(formData).forEach(key => { if (Array.isArray(formData[key])) formData[key] = [] ; else formData[key] = key === 'npsScore' ? null : '' })
 					// reset NA flags
@@ -538,7 +565,7 @@ export default {
 					clearProgress()
 				}
 
-				return { currentStep, questions, totalSteps, currentQuestion, progressPercentage, formData, isSubmitting, submitError, stepError, config, getQuestionType, setAnswer, onNAChange, naFlags, toggleNA, nextStep, previousStep, submitSurvey, retrySubmit, resetSurvey, logoSvg, tokenState, welcomeTitle, thankYouTitle, isTokenValidForStart, hasValidToken, isTokenUsed, tokenErrorMessage }
+				return { currentStep, slideDirection, questions, totalSteps, currentQuestion, progressPercentage, formData, isSubmitting, submitError, stepError, config, getQuestionType, setAnswer, onNAChange, naFlags, toggleNA, nextStep, previousStep, submitSurvey, testSubmit, isDev, retrySubmit, resetSurvey, logoSvg, tokenState, welcomeTitle, thankYouTitle, isTokenValidForStart, hasValidToken, isTokenUsed, tokenErrorMessage }
 	}
 }
 </script>
@@ -602,5 +629,76 @@ button:disabled {
 	right: 0;
 	bottom: 0;
 	left: 0;
+}
+
+/* Transition container */
+.transition-container {
+	position: relative;
+}
+
+/* Slide transitions */
+.slide-left-enter-active,
+.slide-right-enter-active {
+	transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease;
+	will-change: transform, opacity;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
+.slide-left-leave-active,
+.slide-right-leave-active {
+	transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.2s ease;
+	will-change: transform, opacity;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
+.slide-left-leave-active,
+.slide-right-leave-active {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	box-shadow: none !important;
+}
+
+.slide-left-enter-from {
+	transform: translateX(100%);
+	opacity: 0;
+}
+
+.slide-left-enter-to {
+	transform: translateX(0);
+	opacity: 1;
+}
+
+.slide-left-leave-from {
+	transform: translateX(0);
+	opacity: 1;
+}
+
+.slide-left-leave-to {
+	transform: translateX(-100%);
+	opacity: 0;
+}
+
+.slide-right-enter-from {
+	transform: translateX(-100%);
+	opacity: 0;
+}
+
+.slide-right-enter-to {
+	transform: translateX(0);
+	opacity: 1;
+}
+
+.slide-right-leave-from {
+	transform: translateX(0);
+	opacity: 1;
+}
+
+.slide-right-leave-to {
+	transform: translateX(100%);
+	opacity: 0;
 }
 </style>
