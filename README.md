@@ -1,76 +1,79 @@
-# Pesquisa de Satisfação NPS - Vue.js
+# NPS Satisfaction Survey - Vue.js
 
-Uma aplicação web moderna e responsiva para pesquisas de satisfação NPS (Net Promoter Score) desenvolvida em Vue.js 3 com design mobile-first.
+A modern and responsive web application for NPS (Net Promoter Score) satisfaction surveys built with Vue.js 3 and a mobile-first design approach.
 
-## 📋 Características
+## 📋 Features
 
-- **11 questões de satisfação** incluindo escala NPS (0-10)
-- **Design responsivo** otimizado para dispositivos móveis
-- **Interface moderna** com animações e feedback visual
-- **Validação de formulário** em tempo real
-- **Integração com n8n** para envio de dados
-- **Acessibilidade** com suporte a navegação por teclado
-- **Suporte a modo escuro**
+- **Dynamic question system** loaded from JSON configuration
+- **Multiple question types**: NPS (0-10), Likert scale, multiple choice, and text
+- **Conditional questions** based on student category (A, B, AB)
+- **Responsive design** optimized for mobile devices
+- **Modern interface** with smooth slide transitions and visual feedback
+- **Real-time form validation**
+- **Token-based authentication** via URL parameter
+- **n8n integration** for data submission via backend proxy
+- **Accessibility** with keyboard navigation support
+- **Customizable branding** (logo, colors, company name)
 
-## 🚀 Como usar
+## 🚀 Getting Started
 
-### 1. Instalação
+### 1. Installation
 
 ```bash
-# Clone ou faça download dos arquivos
-# Navegue até a pasta do projeto
+# Clone or download the files
+# Navigate to the project folder
 cd nps-modelo
 
-# Instale as dependências
+# Install dependencies
 npm install
 ```
 
-### 2. Configuração do backend integrado
+### 2. Integrated Backend Configuration
 
-Este projeto junta o frontend e o backend em um único servidor Node.js. Configure o `.env` para que o servidor saiba para onde encaminhar `/api/pesquisa` e `/api/validate-token` no n8n, mantendo a chave API em segredo.
+This project combines frontend and backend into a single Node.js server. Configure the `.env` file so the server knows where to forward `/api/pesquisa` and `/api/validate-token` to n8n, keeping the API key secure.
 
 ```bash
 NPS_SURVEY_WEBHOOK_URL=https://n8n.vempramodelo.com/webhook/nps-modelo/EnviarPesquisa
 NPS_VALIDATION_WEBHOOK_URL=https://n8n.vempramodelo.com/webhook/nps-modelo/GetDadosProcesso
-NPS_API_KEY=chave-secreta
+NPS_API_KEY=secret-key
 NPS_API_KEY_HEADER=x-api-key
 ```
 
-O frontend continuará chamando `/api/pesquisa` e `/api/validate-token`; o servidor cuidará de repassar as requisições para os webhooks do n8n com os cabeçalhos corretos.
+The frontend will continue calling `/api/pesquisa` and `/api/validate-token`; the server will handle forwarding requests to n8n webhooks with the correct headers.
 
 ### Tokens
 
-- O token usado para abrir a pesquisa deve vir da URL (query string `?token=...` ou o último segmento). Isso garante que cada aluno use o token exclusivo recebido pela autoescola.
-- O fallback em `NPS_DEFAULT_TOKEN` existe apenas para testes manuais locais e deve ficar em branco em prod. Evite colocar um valor real aí em commits ou builds públicos.
+- The token used to open the survey must come from the URL (query string `?token=...` or the last segment). This ensures each student uses the unique token provided by the driving school.
+- The fallback in `NPS_DEFAULT_TOKEN` exists only for local manual testing and should be left blank in production. Avoid putting a real value there in public commits or builds.
 
-## ⚠️ Erros comuns
+## ⚠️ Common Errors
 
-- `NPS_VALIDATION_WEBHOOK_URL ausente no servidor`: significa que o `.env` está faltando `NPS_VALIDATION_WEBHOOK_URL`. Adicione esse valor para que o servidor saiba para qual webhook n8n encaminhar a validação.
-- `NPS_SURVEY_WEBHOOK_URL ausente no servidor`: informe a URL de envio (`/EnviarPesquisa`).
+- `NPS_VALIDATION_WEBHOOK_URL missing on server`: means the `.env` file is missing `NPS_VALIDATION_WEBHOOK_URL`. Add this value so the server knows which n8n webhook to forward validation to.
+- `NPS_SURVEY_WEBHOOK_URL missing on server`: provide the submission URL (`/EnviarPesquisa`).
 
-### 3. Executar o projeto
+### 3. Running the Project
 
 ```bash
-# Modo de desenvolvimento (frontend + backend juntos)
+# Development mode (frontend + backend together)
 npm run dev
 
-# Gerar a build (usa Vite normalmente)
+# Build production version (uses Vite)
 npm run build
 
-# Executar o servidor integrado com a build gerada
+# Run integrated server with generated build
 npm run start
 ```
 
-A aplicação estará disponível em `http://localhost:3000` (ou na porta definida por `PORT`).
+The application will be available at `http://localhost:3000` (or the port defined by `PORT`).
 
-## 📊 Estrutura dos dados enviados para o n8n
+## 📊 Data Structure Sent to n8n
 
-A aplicação envia um JSON estruturado com os seguintes campos:
+The application sends a structured JSON with the following fields:
 
 ```json
 {
   "timestamp": "2025-11-14T10:30:00.000Z",
-  "autoescola": "Nome da Autoescola",
+  "autoescola": "Driving School Name",
   "nps_score": 9,
   "overall_satisfaction": "satisfied",
   "reception_service": "totally_satisfied",
@@ -79,101 +82,234 @@ A aplicação envia um JSON estruturado com os seguintes campos:
   "practical_instructor": "totally_satisfied",
   "vehicle_conditions": "satisfied",
   "infrastructure": "neutral",
-  "dislikes": ["Prazo para início das aulas práticas"],
-  "likes": ["Qualidade das aulas práticas", "Profissionalismo dos instrutores"],
-  "comments": "Comentários opcionais do usuário"
+  "dislikes": ["Time to start practical classes"],
+  "likes": ["Quality of practical classes", "Professionalism of instructors"],
+  "comments": "Optional user comments"
 }
 ```
 
-### Valores possíveis para escalas Likert:
+### Possible values for Likert scales:
 - `totally_dissatisfied`
 - `dissatisfied`
 - `neutral`
 - `satisfied`
 - `totally_satisfied`
 
-## 📱 Recursos Mobile
+## 📱 Mobile Features
 
-- **Layout responsivo** que se adapta a qualquer tamanho de tela
-- **Componentes otimizados para touch** com áreas de toque adequadas
-- **Fontes e espaçamentos escaláveis**
-- **Navegação fluida** com scroll suave
-- **Feedback visual** para todas as interações
+- **Responsive layout** that adapts to any screen size
+- **Touch-optimized components** with appropriate touch areas
+- **Scalable fonts and spacing**
+- **Smooth navigation** with fluid scrolling
+- **Visual feedback** for all interactions
 
-## 🎨 Personalização
+## 🎨 Customization
 
-### Cores e tema
-Edite o arquivo `src/style.css` para personalizar:
-- Cores principais (variáveis CSS)
-- Gradientes de fundo
-- Estilos dos componentes
+### Questions Configuration
 
-### Logo da empresa
-1. Coloque sua logo em `public/logo.png`
-2. Ative a exibição no arquivo `src/config/n8n.js`:
-```javascript
-autoescola: {
-  showLogo: true,
-  logoUrl: '/logo.png'
+Edit `src/config/questions.json` to customize survey questions:
+
+```json
+{
+  "version": "1.0",
+  "categories": {
+    "car": { "label": "Carro", "description": "Aulas práticas de carro" },
+    "moto": { "label": "Moto", "description": "Aulas práticas de moto" }
+  },
+  "questions": [
+    {
+      "key": "npsScore",
+      "question": "De 0 a 10, quanto você indicaria nossa autoescola?",
+      "type": "nps",
+      "required": true,
+      "order": 1
+    },
+    {
+      "key": "overallSatisfaction",
+      "question": "Como você avalia sua satisfação geral?",
+      "type": "likert",
+      "required": true,
+      "order": 2
+    }
+    // ... more questions
+  ]
 }
 ```
 
-## 🔧 Estrutura do projeto
+**Supported question types:**
+- `nps` - Net Promoter Score (0-10 scale)
+- `likert` - 5-point satisfaction scale
+- `multiple` - Multiple choice with checkboxes
+- `text` - Free text input
 
-```
-src/
-├── components/
-│   ├── NPSSurvey.vue      # Componente principal da pesquisa
-│   ├── LikertScale.vue    # Escala Likert (1-5)
-│   └── MultipleChoice.vue # Seleção múltipla
-├── config/
-│   └── n8n.js            # Configuração da integração n8n
-├── style.css             # Estilos globais
-├── App.vue               # Componente raiz
-└── main.js               # Ponto de entrada
-```
-
-## 🌐 Integração com n8n
-
-O servidor Node integrado expõe `/api/pesquisa` e `/api/validate-token` e encaminha todas as requisições para os webhooks do n8n, adicionando o cabeçalho `x-api-key` apropriado e garantindo que o token e outros metadados sejam enviados no corpo da requisição.
-
-### Fluxo recomendado
-
-```
-Frontend → Backend proxy protegido → Webhook n8n
+**Conditional questions** (show based on student category):
+```json
+{
+  "key": "practicalCarClasses",
+  "conditional": true,
+  "showIf": { "studentCategory": ["B", "AB"] }
+}
 ```
 
-No n8n, o workflow pode ser o mesmo de antes:
+See [DYNAMIC_QUESTIONS.md](DYNAMIC_QUESTIONS.md) for detailed documentation.
 
-1. Webhook (POST) para `/webhook/survey`
-2. JSON Parser (opcional)
-3. Processamento (banco de dados, planilhas, notificações, etc.)
+### Colors and Theme
 
-O backend é responsável por traduzir o JSON recebido do frontend para o payload esperado pelo n8n e por repassar o `token` na carga útil para que o webhook possa marcar a pesquisa como enviada.
+Edit `src/style.css` to customize:
+```css
+:root {
+  /* Primary colors */
+  --primary-color: #3b82f6;
+  --primary-dark: #2563eb;
+  
+  /* Background gradient */
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+```
 
-## 📋 TODO / Melhorias futuras
+### Company Branding
 
-- [ ] Adicionar validação de email opcional
-- [ ] Implementar modo offline com sync posterior
-- [ ] Adicionar analytics de abandono de formulário
-- [ ] Suporte a múltiplos idiomas
-- [ ] Exportação de dados em CSV
-- [ ] Dashboard de resultados
-- [ ] Integração com Google Analytics
+Set environment variables in `.env`:
+```bash
+NPS_AUTOESCOLA_NAME=Your Driving School Name
+NPS_AUTOESCOLA_LOGO_URL=/logo.png
+NPS_AUTOESCOLA_SHOW_LOGO=true
+```
 
-## 🤝 Contribuição
+Or edit `src/config/n8n.js` directly.
 
-Sinta-se à vontade para contribuir com melhorias:
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
+## 🔧 Project Structure
 
-## 📄 Licença
+```
+nps-modelo/
+├── src/
+│   ├── components/
+│   │   ├── NPSSurvey.vue      # Main survey component
+│   │   ├── LikertScale.vue    # Likert scale (1-5)
+│   │   ├── MultipleChoice.vue # Multiple choice selection
+│   │   ├── Alert.vue          # Alert/notification component
+│   │   ├── NAButton.vue       # Not Applicable button
+│   │   └── Spinner.vue        # Loading spinner
+│   ├── config/
+│   │   ├── questions.json     # Survey questions configuration
+│   │   ├── questionsHelper.js # Question processing utilities
+│   │   └── n8n.js            # Backend API integration
+│   ├── assets/                # Images and static assets
+│   ├── style.css             # Global styles and CSS variables
+│   ├── App.vue               # Root component
+│   └── main.js               # Entry point
+├── server/
+│   └── index.js              # Express server (proxy to n8n)
+├── public/                   # Public static files
+├── Dockerfile                # Docker image configuration
+├── docker-compose.yml        # Docker Compose configuration
+├── vite.config.js           # Vite build configuration
+├── tailwind.config.js       # Tailwind CSS configuration
+└── package.json             # Dependencies and scripts
+```
 
-Este projeto está sob licença MIT. Veja o arquivo LICENSE para mais detalhes.
+## 🌐 n8n Integration
+
+The integrated Node.js server exposes `/api/pesquisa` and `/api/validate-token` and forwards all requests to n8n webhooks, adding the appropriate `x-api-key` header and ensuring the token and other metadata are sent in the request body.
+
+### Recommended Flow
+
+```
+Frontend → Protected backend proxy → n8n Webhook
+```
+
+In n8n, the workflow can be the same as before:
+
+1. Webhook (POST) to `/webhook/survey`
+2. JSON Parser (optional)
+3. Processing (database, spreadsheets, notifications, etc.)
+
+The backend is responsible for translating the JSON received from the frontend to the payload expected by n8n and for forwarding the `token` in the payload so the webhook can mark the survey as submitted.
+
+## 🐳 Docker Deployment
+
+### Quick Start with Docker Hub
+
+The easiest way to deploy is using the pre-built Docker image:
+
+```bash
+# Pull the image
+docker pull marcoscdoni/nps-modelo:latest
+
+# Run with environment variables
+docker run -d \
+  -p 3000:3000 \
+  --env-file .env \
+  --name nps-modelo \
+  marcoscdoni/nps-modelo:latest
+```
+
+### Using Docker Compose (Recommended)
+
+1. Create `.env` file with your configuration
+2. Run: `docker compose up -d`
+
+The `docker-compose.yml` is already configured to use the Docker Hub image.
+
+### Building Locally
+
+```bash
+# Build image
+docker build -t marcoscdoni/nps-modelo:latest .
+
+# Run container
+docker compose up -d
+```
+
+### Deployment Guides
+
+- **Hetzner VPS**: See [DEPLOY-HETZNER.md](DEPLOY-HETZNER.md) for complete setup guide
+- **Quick Commands**: See [QUICK-DEPLOY.md](QUICK-DEPLOY.md) for common tasks
+- **Docker Hub**: See [DOCKER-HUB.md](DOCKER-HUB.md) for publishing new versions
+
+### Update Application
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+## 📋 TODO / Future Improvements
+
+- [ ] Add optional email validation
+- [ ] Implement offline mode with later sync
+- [ ] Add form abandonment analytics
+- [ ] Multi-language support (i18n)
+- [ ] CSV data export
+- [ ] Results dashboard with charts
+- [ ] Google Analytics integration
+- [ ] A/B testing for questions
+- [ ] Export questions configuration UI
+- [ ] API for dynamic question loading
+- [ ] Survey completion webhooks
+- [ ] Custom question types (rating stars, sliders)
+
+## 📚 Additional Documentation
+
+- [DYNAMIC_QUESTIONS.md](DYNAMIC_QUESTIONS.md) - Dynamic question system guide
+- [PERSISTENCE.md](PERSISTENCE.md) - Data persistence and storage
+- [OPEN-GRAPH.md](OPEN-GRAPH.md) - Social media sharing configuration
+- [DEPLOY-HETZNER.md](DEPLOY-HETZNER.md) - Complete Hetzner deployment guide
+- [DOCKER-HUB.md](DOCKER-HUB.md) - Docker Hub publishing guide
+- [QUICK-DEPLOY.md](QUICK-DEPLOY.md) - Quick deployment reference
+
+## 🤝 Contributing
+
+Feel free to contribute with improvements:
+1. Fork the project
+2. Create a branch for your feature
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
+
+## 📄 License
+
+This project is under the MIT license. See the LICENSE file for more details.
 
 ---
 
-**Desenvolvido com ❤️ para melhorar a experiência do cliente em autoescolas**
+**Developed with ❤️ to improve customer experience at driving schools**

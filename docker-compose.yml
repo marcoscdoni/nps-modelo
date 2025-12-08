@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   nps-survey:
-    build: .
+    image: marcoscdoni/nps-modelo:latest
     container_name: nps-modelo
     restart: unless-stopped
     ports:
@@ -14,6 +14,7 @@ services:
       - NPS_VALIDATION_WEBHOOK_URL=${NPS_VALIDATION_WEBHOOK_URL}
       - NPS_API_KEY=${NPS_API_KEY}
       - NPS_API_KEY_HEADER=${NPS_API_KEY_HEADER:-x-api-key}
+      - NPS_DEFAULT_TOKEN=${NPS_DEFAULT_TOKEN}
     env_file:
       - .env
     networks:
