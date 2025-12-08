@@ -288,15 +288,6 @@ docker compose pull && docker compose up -d
 - [ ] Survey completion webhooks
 - [ ] Custom question types (rating stars, sliders)
 
-## 📚 Additional Documentation
-
-- [DYNAMIC_QUESTIONS.md](DYNAMIC_QUESTIONS.md) - Dynamic question system guide
-- [PERSISTENCE.md](PERSISTENCE.md) - Data persistence and storage
-- [OPEN-GRAPH.md](OPEN-GRAPH.md) - Social media sharing configuration
-- [DEPLOY-HETZNER.md](DEPLOY-HETZNER.md) - Complete Hetzner deployment guide
-- [DOCKER-HUB.md](DOCKER-HUB.md) - Docker Hub publishing guide
-- [QUICK-DEPLOY.md](QUICK-DEPLOY.md) - Quick deployment reference
-
 ## 🤝 Contributing
 
 Feel free to contribute with improvements:
