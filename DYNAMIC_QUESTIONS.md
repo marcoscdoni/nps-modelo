@@ -1,20 +1,20 @@
-# Sistema de Questões Dinâmicas
+# Dynamic Questions System
 
-## Visão Geral
+## Overview
 
-O sistema de questões foi refatorado para ser totalmente dinâmico, permitindo configuração via JSON sem necessidade de alterar código.
+The question system has been refactored to be fully dynamic, allowing configuration via JSON without needing to change code.
 
-## Arquitetura
+## Architecture
 
-### Arquivos
+### Files
 
-- **`src/config/questions.json`**: Arquivo de configuração com todas as questões
-- **`src/config/questionsHelper.js`**: Funções helper para carregar e processar questões
-- **`src/components/NPSSurvey.vue`**: Componente principal (agora usa o sistema dinâmico)
+- **`src/config/questions.json`**: Configuration file with all questions
+- **`src/config/questionsHelper.js`**: Helper functions to load and process questions
+- **`src/components/NPSSurvey.vue`**: Main component (now uses the dynamic system)
 
-## Estrutura do JSON
+## JSON Structure
 
-### Configuração Principal
+### Main Configuration
 
 ```json
 {
@@ -24,66 +24,66 @@ O sistema de questões foi refatorado para ser totalmente dinâmico, permitindo 
 }
 ```
 
-### Categorias
+### Categories
 
-Definem grupos de questões condicionais:
+Define groups of conditional questions:
 
 ```json
 "categories": {
   "car": {
-    "label": "Carro",
-    "description": "Aulas práticas de carro"
+    "label": "Car",
+    "description": "Practical car classes"
   },
   "moto": {
-    "label": "Moto",
-    "description": "Aulas práticas de moto"
+    "label": "Motorcycle",
+    "description": "Practical motorcycle classes"
   }
 }
 ```
 
-### Estrutura de Questão
+### Question Structure
 
 ```json
 {
   "key": "practicalCarClasses",
-  "question": "Como você avalia a qualidade das aulas práticas de carro?",
+  "question": "How do you rate the quality of practical car classes?",
   "type": "likert",
   "required": false,
   "order": 5,
-  "description": "Texto de ajuda (opcional)",
+  "description": "Help text (optional)",
   "category": "car",
   "conditional": true,
   "naOption": {
     "enabled": true,
-    "label": "Não fiz essa categoria"
+    "label": "I didn't take this category"
   },
-  "options": ["Opção 1", "Opção 2"],
-  "placeholder": "Texto do placeholder (para type=text)"
+  "options": ["Option 1", "Option 2"],
+  "placeholder": "Placeholder text (for type=text)"
 }
 ```
 
-## Propriedades das Questões
+## Question Properties
 
-### Obrigatórias
+### Required
 
-- **`key`** (string): Identificador único da questão. Usado para salvar no formData e localStorage
-- **`question`** (string): Texto da pergunta exibido ao usuário
-- **`type`** (string): Tipo da questão. Valores: `"nps"`, `"likert"`, `"multiple"`, `"text"`
-- **`required`** (boolean): Se a pergunta é obrigatória
-- **`order`** (number): Ordem de exibição (questões são ordenadas automaticamente)
+- **`key`** (string): Unique question identifier. Used to save in formData and localStorage
+- **`question`** (string): Question text displayed to user
+- **`type`** (string): Question type. Values: `"nps"`, `"likert"`, `"multiple"`, `"text"`
+- **`required`** (boolean): Whether the question is mandatory
+- **`order`** (number): Display order (questions are sorted automatically)
 
-### Opcionais
+### Optional
 
-- **`description`** (string): Texto explicativo adicional abaixo da pergunta
-- **`category`** (string): Categoria da questão (referência ao objeto categories)
-- **`conditional`** (boolean): Se a questão é condicional (pode ser ocultada)
-- **`naOption`** (object): Configuração da opção "Não Aplicável"
-  - `enabled` (boolean): Se mostra o botão NA
-  - `label` (string): Texto do botão NA
-- **`options`** (array): Lista de opções (obrigatório para `type="multiple"`)
-- **`placeholder`** (string): Placeholder do campo (para `type="text"`)
+- **`description`** (string): Additional explanatory text below the question
+- **`category`** (string): Question category (reference to categories object)
+- **`conditional`** (boolean): Whether the question is conditional (can be hidden)
+- **`naOption`** (object): "Not Applicable" option configuration
+  - `enabled` (boolean): Whether to show NA button
+  - `label` (string): NA button text
+- **`options`** (array): List of options (required for `type="multiple"`)
+- **`placeholder`** (string): Field placeholder (for `type="text"`)
 
-## Tipos de Questões
+## Question Types
 
 ### NPS (Net Promoter Score)
 
@@ -91,11 +91,11 @@ Definem grupos de questões condicionais:
 {
   "type": "nps",
   "key": "npsScore",
-  "question": "De 0 a 10, quanto você nos indicaria?"
+  "question": "From 0 to 10, how likely would you recommend us?"
 }
 ```
 
-Exibe botões de 0-10 para pontuação.
+Displays 0-10 buttons for scoring.
 
 ### Likert Scale
 
@@ -103,41 +103,41 @@ Exibe botões de 0-10 para pontuação.
 {
   "type": "likert",
   "key": "satisfaction",
-  "question": "Como você avalia...?"
+  "question": "How do you rate...?"
 }
 ```
 
-Exibe 5 opções: Totalmente insatisfeito → Totalmente satisfeito
+Displays 5 options: Totally dissatisfied → Totally satisfied
 
-### Múltipla Escolha
+### Multiple Choice
 
 ```json
 {
   "type": "multiple",
   "key": "likes",
-  "question": "O que você gostou?",
-  "options": ["Opção 1", "Opção 2", "Opção 3"]
+  "question": "What did you like?",
+  "options": ["Option 1", "Option 2", "Option 3"]
 }
 ```
 
-Permite selecionar múltiplas opções via checkboxes.
+Allows selecting multiple options via checkboxes.
 
-### Texto Livre
+### Free Text
 
 ```json
 {
   "type": "text",
   "key": "comments",
-  "question": "Comentários",
-  "placeholder": "Escreva aqui..."
+  "question": "Comments",
+  "placeholder": "Write here..."
 }
 ```
 
-Campo de texto textarea.
+Textarea text field.
 
-## Questões Condicionais
+## Conditional Questions
 
-### Definindo uma Questão Condicional
+### Defining a Conditional Question
 
 ```json
 {
@@ -146,45 +146,45 @@ Campo de texto textarea.
   "category": "car",
   "naOption": {
     "enabled": true,
-    "label": "Não fiz aula de carro"
+    "label": "I didn't take car classes"
   }
 }
 ```
 
-### Comportamento
+### Behavior
 
-- Quando `naOption.enabled = true`, exibe botão "NA"
-- Se usuário marca NA, a questão é pulada (não obrigatória)
-- O valor é salvo como `"not_applicable"` no formData
+- When `naOption.enabled = true`, displays "NA" button
+- If user marks NA, the question is skipped (not required)
+- The value is saved as `"not_applicable"` in formData
 
-## Validações
+## Validations
 
-### Validação Automática
+### Automatic Validation
 
-O sistema valida automaticamente:
+The system automatically validates:
 
-- **NPS**: Valor de 0-10 deve ser selecionado se obrigatório
-- **Likert**: Uma opção deve ser selecionada (ou marcada como NA)
-- **Multiple**: Pelo menos uma opção se obrigatória
-- **Text**: Campo não pode estar vazio se obrigatório
+- **NPS**: Value 0-10 must be selected if required
+- **Likert**: One option must be selected (or marked as NA)
+- **Multiple**: At least one option if required
+- **Text**: Field cannot be empty if required
 
-### Customizando Validações
+### Customizing Validations
 
-Edite `src/config/questionsHelper.js` na função `validateQuestion()`:
+Edit `src/config/questionsHelper.js` in the `validateQuestion()` function:
 
 ```javascript
 export const validateQuestion = (question, answer, naFlags = {}) => {
-  // Sua lógica customizada aqui
+  // Your custom logic here
   
   return { valid: true, error: '' }
 }
 ```
 
-## Funções Helper Disponíveis
+## Available Helper Functions
 
 ### `loadQuestions()`
 
-Carrega e ordena as questões do JSON.
+Loads and sorts questions from JSON.
 
 ```javascript
 const { version, categories, questions } = loadQuestions()
@@ -192,7 +192,7 @@ const { version, categories, questions } = loadQuestions()
 
 ### `getInitialFormData()`
 
-Gera estrutura inicial do formData baseado nas questões.
+Generates initial formData structure based on questions.
 
 ```javascript
 const formData = reactive(getInitialFormData())
@@ -200,7 +200,7 @@ const formData = reactive(getInitialFormData())
 
 ### `getInitialNAFlags()`
 
-Gera flags NA para questões condicionais.
+Generates NA flags for conditional questions.
 
 ```javascript
 const naFlags = reactive(getInitialNAFlags())
@@ -208,7 +208,7 @@ const naFlags = reactive(getInitialNAFlags())
 
 ### `validateQuestion(question, answer, naFlags)`
 
-Valida uma resposta.
+Validates an answer.
 
 ```javascript
 const { valid, error } = validateQuestion(currentQuestion, formData[key], naFlags)
@@ -216,54 +216,54 @@ const { valid, error } = validateQuestion(currentQuestion, formData[key], naFlag
 
 ### `getQuestionTypeLabel(type)`
 
-Retorna label do tipo de questão.
+Returns question type label.
 
 ```javascript
-const label = getQuestionTypeLabel('nps') // "Escala 0-10"
+const label = getQuestionTypeLabel('nps') // "0-10 Scale"
 ```
 
 ### `getQuestionsByCategory(category)`
 
-Filtra questões por categoria.
+Filters questions by category.
 
 ```javascript
 const carQuestions = getQuestionsByCategory('car')
 ```
 
-## Adicionando Nova Questão
+## Adding New Question
 
-1. Abra `src/config/questions.json`
-2. Adicione novo objeto no array `questions`:
+1. Open `src/config/questions.json`
+2. Add new object to `questions` array:
 
 ```json
 {
   "key": "newQuestion",
-  "question": "Sua nova pergunta?",
+  "question": "Your new question?",
   "type": "likert",
   "required": true,
   "order": 14
 }
 ```
 
-3. Atualize a função `submitSurvey` em `NPSSurvey.vue` se a nova questão requer campo especial no payload
+3. Update the `submitSurvey` function in `NPSSurvey.vue` if the new question requires a special field in the payload
 
-## Compatibilidade com LocalStorage
+## LocalStorage Compatibility
 
-O sistema mantém compatibilidade total:
+The system maintains full compatibility:
 
-- Questões antigas continuam funcionando
-- Dados salvos anteriormente são carregados corretamente
-- Chaves (keys) devem permanecer inalteradas para manter compatibilidade
+- Old questions continue working
+- Previously saved data is loaded correctly
+- Keys must remain unchanged to maintain compatibility
 
-## Exemplo Completo
+## Complete Example
 
-### Adicionando Questão de Satisfação com Simulador
+### Adding Satisfaction Question with Simulator
 
 ```json
 {
   "key": "simulatorSatisfaction",
-  "question": "Como você avalia o simulador de direção?",
-  "description": "Avalie a qualidade e utilidade do simulador",
+  "question": "How do you rate the driving simulator?",
+  "description": "Rate the quality and usefulness of the simulator",
   "type": "likert",
   "required": false,
   "order": 10.5,
@@ -271,32 +271,32 @@ O sistema mantém compatibilidade total:
   "conditional": true,
   "naOption": {
     "enabled": true,
-    "label": "Não usei o simulador"
+    "label": "I didn't use the simulator"
   }
 }
 ```
 
-1. Adicione a categoria se não existir:
+1. Add the category if it doesn't exist:
 
 ```json
 "categories": {
   "simulator": {
-    "label": "Simulador",
-    "description": "Treinamento no simulador de direção"
+    "label": "Simulator",
+    "description": "Driving simulator training"
   }
 }
 ```
 
-2. Atualize o payload de envio (se necessário) em `submitSurvey()`
+2. Update the submission payload (if needed) in `submitSurvey()`
 
-3. Pronto! A questão aparecerá automaticamente na ordem 10.5
+3. Done! The question will automatically appear in order 10.5
 
-## Vantagens
+## Advantages
 
-✅ **Sem código**: Adicione/edite questões sem programar
-✅ **Versionamento**: Histórico de mudanças via git
-✅ **Reutilizável**: Mesma estrutura para diferentes pesquisas
-✅ **Validação centralizada**: Uma função valida todas as questões
-✅ **Condicional**: Questões aparecem/desaparecem baseado em respostas
-✅ **Categorização**: Agrupe questões relacionadas
-✅ **Ordem flexível**: Use decimais para inserir entre questões existentes
+✅ **No code**: Add/edit questions without programming
+✅ **Version control**: Change history via git
+✅ **Reusable**: Same structure for different surveys
+✅ **Centralized validation**: One function validates all questions
+✅ **Conditional**: Questions appear/disappear based on answers
+✅ **Categorization**: Group related questions
+✅ **Flexible ordering**: Use decimals to insert between existing questions

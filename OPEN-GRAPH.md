@@ -1,60 +1,60 @@
 # Open Graph Image
 
-Para o preview funcionar perfeitamente no WhatsApp, crie uma imagem chamada `og-image.jpg` na pasta `public/` com estas características:
+For the preview to work perfectly on WhatsApp, create an image called `og-image.jpg` in the `public/` folder with these characteristics:
 
-## 📐 Especificações da imagem:
+## 📐 Image Specifications:
 
-- **Tamanho**: 1200x630 pixels (formato landscape)
-- **Formato**: JPG ou PNG
-- **Peso**: Máximo 300KB
-- **Conteúdo sugerido**:
-  - Logo da Autoescola Modelo
-  - Texto: "Pesquisa de Satisfação"
-  - Subtexto: "Sua opinião é importante!"
-  - Background com as cores da marca
+- **Size**: 1200x630 pixels (landscape format)
+- **Format**: JPG or PNG
+- **File size**: Maximum 300KB
+- **Suggested content**:
+  - Driving School Logo
+  - Text: "Satisfaction Survey"
+  - Subtext: "Your opinion matters!"
+  - Background with brand colors
 
-## 🎨 Exemplo de layout:
+## 🎨 Layout Example:
 
 ```
 ┌─────────────────────────────────────────┐
-│  [LOGO]     AUTOESCOLA MODELO           │
+│  [LOGO]     DRIVING SCHOOL              │
 │                                         │
-│     📊 PESQUISA DE SATISFAÇÃO           │
+│     📊 SATISFACTION SURVEY              │
 │                                         │
-│    Sua opinião é muito importante       │
-│         para nós!                       │
+│    Your opinion is very important       │
+│         to us!                          │
 │                                         │
-│    ⏱️ Leva apenas 3 minutos             │
+│    ⏱️ Takes only 3 minutes              │
 └─────────────────────────────────────────┘
 ```
 
-## 🚀 Como adicionar:
+## 🚀 How to Add:
 
-1. Crie a imagem no Canva, Figma ou Photoshop
-2. Salve como `og-image.jpg`
-3. Coloque na pasta `public/og-image.jpg`
-4. Faça commit e deploy
+1. Create the image in Canva, Figma or Photoshop
+2. Save as `og-image.jpg`
+3. Place in the `public/og-image.jpg` folder
+4. Commit and deploy
 
-## 🔧 Alternativa rápida:
+## 🔧 Quick Alternative:
 
-Se não tiver imagem agora, remova essas linhas do `index.html`:
+If you don't have an image now, remove these lines from `index.html`:
 
 ```html
-<meta property="og:image" content="https://pesquisa.vempramodelo.com/og-image.jpg" />
-<meta property="twitter:image" content="https://pesquisa.vempramodelo.com/og-image.jpg" />
+<meta property="og:image" content="https://survey.yourdomain.com/og-image.jpg" />
+<meta property="twitter:image" content="https://survey.yourdomain.com/og-image.jpg" />
 ```
 
-O preview vai funcionar só com título e descrição.
+The preview will work with just title and description.
 
-## ✅ Resultado no WhatsApp:
+## ✅ Result on WhatsApp:
 
-Depois das alterações, o link vai aparecer assim:
+After the changes, the link will appear like this:
 
 ```
-📊 Pesquisa de Satisfação - Autoescola Modelo
-Sua opinião é muito importante para nós! Participe da nossa pesquisa de satisfação. Leva apenas 3 minutos.
-[IMAGEM se tiver]
-pesquisa.vempramodelo.com
+📊 Satisfaction Survey - Driving School
+Your opinion is very important to us! Participate in our satisfaction survey. Takes only 3 minutes.
+[IMAGE if available]
+survey.yourdomain.com
 ```
 
-Muito mais profissional! 🎉
+Much more professional! 🎉
