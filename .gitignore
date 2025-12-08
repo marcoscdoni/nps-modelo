@@ -14,3 +14,4 @@ test-*.sh
 QUICK-DEPLOY.md
 PUBLISH.md
 *.sh
+docs/
