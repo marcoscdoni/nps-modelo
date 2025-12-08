@@ -64,10 +64,10 @@ nano .env
 Add your environment variables:
 ```env
 NPS_API_KEY_HEADER=x-api-key
-NPS_API_KEY=WnILyK16zL8WH6hi3vSL587QvC3TyaUR
-NPS_DEFAULT_TOKEN=27A71581-FBE9-4D65-88D2-3A99DC4199AB
-NPS_SURVEY_WEBHOOK_URL=https://n8n.vempramodelo.com/webhook/nps-modelo/EnviarPesquisa
-NPS_VALIDATION_WEBHOOK_URL=https://n8n.vempramodelo.com/webhook/link-aluno/GetDadosProcesso
+NPS_API_KEY=your-api-key-here
+NPS_DEFAULT_TOKEN=your-default-token-here
+NPS_SURVEY_WEBHOOK_URL=https://your-n8n-instance.com/webhook/survey
+NPS_VALIDATION_WEBHOOK_URL=https://your-n8n-instance.com/webhook/validate
 ```
 
 Save and exit: `Ctrl + X`, then `Y`, then `Enter`

@@ -33,9 +33,9 @@ npm install
 This project combines frontend and backend into a single Node.js server. Configure the `.env` file so the server knows where to forward `/api/pesquisa` and `/api/validate-token` to n8n, keeping the API key secure.
 
 ```bash
-NPS_SURVEY_WEBHOOK_URL=https://n8n.vempramodelo.com/webhook/nps-modelo/EnviarPesquisa
-NPS_VALIDATION_WEBHOOK_URL=https://n8n.vempramodelo.com/webhook/nps-modelo/GetDadosProcesso
-NPS_API_KEY=secret-key
+NPS_SURVEY_WEBHOOK_URL=https://your-n8n-instance.com/webhook/survey
+NPS_VALIDATION_WEBHOOK_URL=https://your-n8n-instance.com/webhook/validate
+NPS_API_KEY=your-secret-api-key
 NPS_API_KEY_HEADER=x-api-key
 ```
 

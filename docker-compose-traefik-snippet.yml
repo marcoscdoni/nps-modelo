@@ -20,7 +20,7 @@
       - "3000"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nps-survey.rule=Host(`survey.vempramodelo.com`)"
+      - "traefik.http.routers.nps-survey.rule=Host(`survey.yourdomain.com`)"
       - "traefik.http.routers.nps-survey.entrypoints=websecure"
       - "traefik.http.routers.nps-survey.tls.certresolver=letsencrypt"
       - "traefik.http.services.nps-survey.loadbalancer.server.port=3000"
